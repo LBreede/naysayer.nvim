@@ -28,9 +28,11 @@ end
 do
   vim.pack.add({
     { src = "https://github.com/nvim-mini/mini.pairs", version = "stable" },
+    { src = "https://github.com/nvim-mini/mini.surround", version = "stable" },
   })
 
   require("mini.pairs").setup()
+  require("mini.surround").setup()
 end
 
 -- ============================================================
@@ -287,30 +289,3 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     vim.hl.on_yank()
   end,
 })
-
--- -- ============================================================
--- -- RULERS
--- -- ============================================================
--- do
---   -- A ruler at each language's formatter width, so a line crossing it is one the
---   --  formatter is about to rewrite. Python gets a second, softer one.
---   --
---   --  NOTE: `colorcolumn` is window-local, not buffer-local, and this autocmd has no
---   --  `pattern` on purpose -- it assigns '' for filetypes with no entry, or the
---   --  ruler from the previous buffer lingers in the same window after `:e`.
---   local widths = {
---     python = "88,110", -- black default line length, FIXME: remove 110
---     lua = "120", -- stylua.toml column_width
---     rust = "100", -- rustfmt default max_width
---     c = "80", -- clang-format LLVM ColumnLimit
---     cpp = "80",
---   }
---
---   vim.api.nvim_create_autocmd("FileType", {
---     desc = "Set colorcolumn per filetype",
---     group = vim.api.nvim_create_augroup("colorcolumn", { clear = true }),
---     callback = function(args)
---       vim.wo.colorcolumn = widths[args.match] or ""
---     end,
---   })
--- end
