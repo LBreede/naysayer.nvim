@@ -23,6 +23,17 @@ do
 end
 
 -- ============================================================
+-- PLUGINS -- local only; master stays plugin-free
+-- ============================================================
+do
+  vim.pack.add({
+    { src = "https://github.com/nvim-mini/mini.pairs", version = "stable" },
+  })
+
+  require("mini.pairs").setup()
+end
+
+-- ============================================================
 -- OPTIONS I WANT THAT BLOW DOES NOT HAVE
 -- ============================================================
 do
