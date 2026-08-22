@@ -183,14 +183,6 @@ end
 -- SMALL THINGS
 -- ============================================================
 do
-  vim.api.nvim_create_autocmd("TextYankPost", {
-    desc = "Flash the yanked text",
-    group = vim.api.nvim_create_augroup("yank-highlight", { clear = true }),
-    callback = function()
-      vim.hl.on_yank()
-    end,
-  })
-
   -- Window navigation without the <C-w> prefix.
   for _, key in ipairs({ "h", "j", "k", "l" }) do
     vim.keymap.set("n", "<C-" .. key .. ">", "<C-w><C-" .. key .. ">", { desc = "Move focus" })
