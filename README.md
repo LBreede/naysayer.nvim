@@ -6,6 +6,15 @@ preferences layered on top instead of mixed into the core.
 
 ## Install
 
+Back up any existing Neovim config, state, and data first:
+
+```sh
+stamp="$(date +%Y%m%d-%H%M%S)"
+test -e "${XDG_CONFIG_HOME:-$HOME/.config}/nvim" && mv "${XDG_CONFIG_HOME:-$HOME/.config}/nvim" "${XDG_CONFIG_HOME:-$HOME/.config}/nvim.bak-$stamp"
+test -e "${XDG_STATE_HOME:-$HOME/.local/state}/nvim" && mv "${XDG_STATE_HOME:-$HOME/.local/state}/nvim" "${XDG_STATE_HOME:-$HOME/.local/state}/nvim.bak-$stamp"
+test -e "${XDG_DATA_HOME:-$HOME/.local/share}/nvim" && mv "${XDG_DATA_HOME:-$HOME/.local/share}/nvim" "${XDG_DATA_HOME:-$HOME/.local/share}/nvim.bak-$stamp"
+```
+
 Clone the repo as Neovim's config directory:
 
 ```sh
