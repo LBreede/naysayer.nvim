@@ -4,6 +4,28 @@ A small Neovim config inspired by Jonathan Blow's Emacs setup: quiet syntax,
 no plugin machinery in the base branch, native editor features first, and local
 preferences layered on top instead of mixed into the core.
 
+## Install
+
+Clone the repo as Neovim's config directory:
+
+```sh
+git clone git@github.com:LBreede/naysayer.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+```
+
+Stay on `master` for the barebones Blow-inspired config:
+
+```sh
+cd "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+git checkout master
+```
+
+Use `local` for the daily-driver overlay:
+
+```sh
+cd "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+git checkout local
+```
+
 ## Branches
 
 `master` is the barebones config. It contains the base editor setup, the
