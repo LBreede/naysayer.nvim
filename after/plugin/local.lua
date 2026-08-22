@@ -130,7 +130,7 @@ do
   --  Kept in a variable rather than inlined, because `LspStatus()` below has to ask
   --  what filetypes each one claims and `vim.lsp.config` is not enumerable --
   --  `pairs()` on it yields only `_configs`.
-  local servers = { "clangd", "basedpyright", "rust_analyzer" }
+  local servers = { "clangd", "basedpyright", "rust_analyzer", "ols" }
   vim.lsp.enable(servers)
 
   ---Statusline field. Empty when a server is attached, and empty when none is
