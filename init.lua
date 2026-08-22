@@ -187,7 +187,7 @@ do
     desc = "Flash the yanked text",
     group = vim.api.nvim_create_augroup("yank-highlight", { clear = true }),
     callback = function()
-      vim.hl.hl_op()
+      vim.hl.on_yank()
     end,
   })
 
@@ -200,4 +200,3 @@ do
 end
 
 -- vim: ts=2 sts=2 sw=2 et
-
