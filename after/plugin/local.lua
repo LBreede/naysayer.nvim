@@ -266,7 +266,18 @@ do
   end, { desc = "[F]ormat buffer" })
 end
 
--- -- -- ============================================================
+-- ============================================================
+-- SMALL THINGS
+-- ============================================================
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "Flash the yanked text",
+  group = vim.api.nvim_create_augroup("yank-highlight", { clear = true }),
+  callback = function()
+    vim.hl.on_yank()
+  end,
+})
+
+-- -- ============================================================
 -- -- RULERS
 -- -- ============================================================
 -- do
@@ -292,4 +303,3 @@ end
 --     end,
 --   })
 -- end
-
