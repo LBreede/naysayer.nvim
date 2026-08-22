@@ -92,6 +92,26 @@ do
   --  NOTE: no `]q` / `[q` here -- Neovim maps those to :cnext / :cprevious itself.
   map("<leader>q", vim.diagnostic.setloclist, "Open diagnostic [Q]uickfix list")
 
+  -- Manual completion only: no popup unless you ask for it. After text, <Tab>
+  --  starts or advances built-in insert completion; after whitespace, it remains
+  --  indentation.
+  vim.keymap.set("i", "<Tab>", function()
+    if vim.fn.pumvisible() == 1 then
+      return "<C-n>"
+    end
+
+    local col = vim.fn.col(".") - 1
+    if col == 0 or vim.fn.getline("."):sub(col, col):match("%s") then
+      return "<Tab>"
+    end
+
+    return "<C-n>"
+  end, { expr = true, desc = "Complete word" })
+
+  vim.keymap.set("i", "<S-Tab>", function()
+    return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
+  end, { expr = true, desc = "Previous completion" })
+
   -- Kickstart's arrow-key tip, verbatim apart from the loop. Failing silently
   --  would just be annoying; naming the replacement is what makes the habit stick.
   for arrow, key in pairs({ left = "h", down = "j", up = "k", right = "l" }) do
