@@ -9,29 +9,28 @@ preferences layered on top instead of mixed into the core.
 Back up any existing Neovim config, state, and data first:
 
 ```sh
-stamp="$(date +%Y%m%d-%H%M%S)"
-test -e "${XDG_CONFIG_HOME:-$HOME/.config}/nvim" && mv "${XDG_CONFIG_HOME:-$HOME/.config}/nvim" "${XDG_CONFIG_HOME:-$HOME/.config}/nvim.bak-$stamp"
-test -e "${XDG_STATE_HOME:-$HOME/.local/state}/nvim" && mv "${XDG_STATE_HOME:-$HOME/.local/state}/nvim" "${XDG_STATE_HOME:-$HOME/.local/state}/nvim.bak-$stamp"
-test -e "${XDG_DATA_HOME:-$HOME/.local/share}/nvim" && mv "${XDG_DATA_HOME:-$HOME/.local/share}/nvim" "${XDG_DATA_HOME:-$HOME/.local/share}/nvim.bak-$stamp"
+test -e "$HOME/.config/nvim" && mv "$HOME/.config/nvim" "$HOME/.config/nvim.bak"
+test -e "$HOME/.local/state/nvim" && mv "$HOME/.local/state/nvim" "$HOME/.local/state/nvim.bak"
+test -e "$HOME/.local/share/nvim" && mv "$HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak"
 ```
 
 Clone the repo as Neovim's config directory:
 
 ```sh
-git clone git@github.com:LBreede/naysayer.nvim.git "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+git clone git@github.com:LBreede/naysayer.nvim.git "$HOME/.config/nvim"
 ```
 
 Stay on `master` for the barebones Blow-inspired config:
 
 ```sh
-cd "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+cd "$HOME/.config/nvim"
 git checkout master
 ```
 
 Use `local` for the daily-driver overlay:
 
 ```sh
-cd "${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+cd "$HOME/.config/nvim"
 git checkout local
 ```
 
