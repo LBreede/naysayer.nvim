@@ -65,7 +65,7 @@ Make barebones changes on `master`:
 git checkout master
 # edit init.lua, colors/naysayer.lua, stylua.toml, README.md
 git add <files>
-git commit -m "chore: ..."
+git commit -m "<type>: ..."
 git push
 ```
 
@@ -111,10 +111,16 @@ Use `fix` for correcting broken behavior:
 fix: use current yank highlight helper
 ```
 
-Use `chore` for repo hygiene, docs, formatting, and metadata:
+Use `docs` for documentation-only changes:
 
 ```text
-chore: add README
+docs: update branch workflow notes
+docs: clarify install steps
+```
+
+Use `chore` for repo hygiene, formatting, and metadata:
+
+```text
 chore: ignore Neovim log file
 ```
 
