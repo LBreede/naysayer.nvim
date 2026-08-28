@@ -25,6 +25,19 @@ end
 -- PLUGINS -- local only; master stays plugin-free
 -- ============================================================
 do
+  -- Two plugins, and the config's only ones. Both clear the bar AGENTS.md sets --
+  --  behavior that is real work to hand-roll -- but mini.pairs needs a further
+  --  word, because it does not merely add something master lacks: it reverses
+  --  README's "no automatic pair completion for `()`, `{}`, `[]`, or quotes",
+  --  which is a listed base principle, not an omission.
+  --
+  --  It stays anyway. `local` is the branch explicitly allowed to diverge, and
+  --  typing the closing half of every brace in C is a tax paid a thousand times a
+  --  day. master keeps the principle intact; nothing here reaches it.
+  --
+  --  `version = "stable"` on both: vim.pack takes a branch or tag name and mini
+  --  ships a `stable` branch. Without it vim.pack follows the default branch, and
+  --  an update takes whatever landed there that morning.
   vim.pack.add({
     { src = "https://github.com/nvim-mini/mini.pairs", version = "stable" },
     { src = "https://github.com/nvim-mini/mini.surround", version = "stable" },
