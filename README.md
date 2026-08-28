@@ -4,6 +4,24 @@ A small Neovim config inspired by Jonathan Blow's Emacs setup: quiet syntax,
 no plugin machinery in the base branch, native editor features first, and local
 preferences layered on top instead of mixed into the core.
 
+## Rationale
+
+The base config follows observations from Jonathan Blow's Emacs setup where they
+map cleanly to Neovim:
+
+- no line numbers; the statusline is the line indicator
+- no file tree, tabs, icons, or visible whitespace markers
+- no automatic pair completion for `()`, `{}`, `[]`, or quotes
+- quiet syntax highlighting, with comments more prominent than most code
+- 4-column hard tabs rather than 8-column tabs or space-expanded indentation
+- search and compiler results as lists to walk with native quickfix commands
+- a plain statusline similar in spirit: file, position, line, version-control
+  state, and filetype
+
+The `local` branch is allowed to diverge for daily use. Plugins and personal UI
+preferences belong there when they add practical editing leverage without
+changing what the base branch is trying to preserve.
+
 ## Install
 
 Back up any existing Neovim config, state, and data first:
