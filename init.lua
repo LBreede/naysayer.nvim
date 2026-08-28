@@ -50,8 +50,12 @@ do
   -- Four spaces, and never a literal tab. C, Odin and Lua ship no indent settings
   --  of their own, so without this they fall through to Vim's raw defaults and
   --  indent with 8-wide tabs. Python and Rust need nothing: their bundled
-  --  ftplugins already set `sw=4` and 'expandtab'. Jai is a filetype Neovim has
-  --  never heard of; it is registered and configured in `after/`, not here.
+  --  ftplugins already set `sw=4` and 'expandtab'.
+  --
+  --  A language Neovim has never heard of gets nothing at all -- no indent
+  --  settings, and no 'commentstring' either, so `gcc` is a silent no-op. That is a
+  --  per-filetype fix and belongs in an `after/ftplugin/` file of your own, not in
+  --  a global here.
   --
   --  'tabstop' stays at the default 8 deliberately. With 'expandtab' on, nothing
   --  here ever *writes* a tab, so 'tabstop' governs one thing only: how somebody
