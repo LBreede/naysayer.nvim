@@ -67,9 +67,6 @@ do
   --  competes with the syntax colours for attention.
   vim.o.cursorline = false
 
-  vim.o.list = true
-  vim.opt.listchars = { tab = "\u{bb} ", trail = "\u{b7}", nbsp = "\u{2423}" }
-
   vim.cmd.colorscheme("naysayer")
 end
 
