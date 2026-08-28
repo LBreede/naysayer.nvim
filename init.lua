@@ -1,5 +1,5 @@
 -- Plugin-free base config, shaped after Jonathan Blow's Emacs setup. Personal
--- additions belong in after/plugin/ on the local branch.
+-- additions belong in a separate overlay repository.
 
 -- ============================================================
 -- OPTIONS
@@ -115,7 +115,7 @@ do
     end,
   })
 
-  ---Reserved for the local overlay to extend the statusline without copying it.
+  ---Reserved for an overlay to extend the statusline without copying it.
   ---@return string
   function _G.StatuslineExtra()
     return ""

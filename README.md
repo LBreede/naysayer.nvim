@@ -1,8 +1,7 @@
 # naysayer.nvim
 
-A small Neovim config inspired by Jonathan Blow's Emacs setup: quiet syntax,
-no plugin machinery in the base branch, native editor features first, and local
-preferences layered on top instead of mixed into the core.
+A small, plugin-free Neovim config inspired by Jonathan Blow's Emacs setup:
+quiet syntax and native editor features first.
 
 ## Rationale
 
@@ -18,9 +17,8 @@ map cleanly to Neovim:
 - a plain statusline similar in spirit: file, position, line, version-control
   state, and filetype
 
-The `local` branch is allowed to diverge for daily use. Plugins and personal UI
-preferences belong there when they add practical editing leverage without
-changing what the base branch is trying to preserve.
+Personal plugins and preferences belong in a separate overlay repository, which
+can load this repository as a submodule without changing the standalone base.
 
 ## Install
 
@@ -38,18 +36,11 @@ Clone the repo as Neovim's config directory:
 git clone git@github.com:LBreede/naysayer.nvim.git "$HOME/.config/nvim"
 ```
 
-Stay on `master` for the barebones Blow-inspired config:
+The default `master` branch is the complete standalone config:
 
 ```sh
 cd "$HOME/.config/nvim"
 git checkout master
-```
-
-Use `local` for the daily-driver overlay:
-
-```sh
-cd "$HOME/.config/nvim"
-git checkout local
 ```
 
 ## Layout
@@ -59,47 +50,41 @@ init.lua              base config
 colors/naysayer.lua   vendored colorscheme
 stylua.toml           formatter settings for this repo
 .editorconfig         editor indent rules, so typing matches stylua
-AGENTS.md              branch ownership and contributor rules
-after/                local overlay, tracked only on local
-lsp/                  local LSP configs, tracked only on local
-nvim-pack-lock.json   local vim.pack lockfile
+AGENTS.md              repository ownership and contributor rules
 ```
+
+## Personal Overlay
+
+To keep personal configuration versioned separately, add this repository as a
+submodule named `base` and load it from the overlay's `init.lua`:
+
+```lua
+local base = vim.fs.joinpath(vim.fn.stdpath("config"), "base")
+vim.opt.runtimepath:prepend(base)
+dofile(vim.fs.joinpath(base, "init.lua"))
+```
+
+The overlay can then own `after/`, `lsp/`, plugins, and personal options while
+this repository remains directly usable on its own.
 
 ## Workflow
 
-Make barebones changes on `master`:
+Make base changes inside the submodule:
 
 ```sh
-git checkout master
-# edit init.lua, colors/naysayer.lua, stylua.toml, .editorconfig, README.md
+cd "$HOME/.config/nvim/base"
+git switch master
+# edit base files
 git add <files>
 git commit -m "<type>: ..."
 git push
 ```
 
-Then update `local`:
+Record the updated base revision in the overlay:
 
 ```sh
-git checkout local
-git rebase master
-git push --force-with-lease
-```
-
-Make daily-driver changes on `local`:
-
-```sh
-git checkout local
-# edit after/, lsp/, nvim-pack-lock.json
-git add <files>
-git commit -m "feat: ..."
+cd "$HOME/.config/nvim"
+git add base
+git commit -m "chore: update base config"
 git push
-```
-
-Do not rebase or merge `master` because of a `local`-only change.
-
-Rule of thumb:
-
-```text
-master changes -> rebase local
-local changes  -> leave master alone
 ```
