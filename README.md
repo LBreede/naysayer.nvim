@@ -70,6 +70,7 @@ branch is an extension branch, not a feature branch waiting to land.
 init.lua              base config
 colors/naysayer.lua   vendored colorscheme
 stylua.toml           formatter settings for this repo
+.editorconfig         editor indent rules, so typing matches stylua
 after/                local overlay, tracked only on local
 lsp/                  local LSP configs, tracked only on local
 nvim-pack-lock.json   local vim.pack lockfile
@@ -81,7 +82,7 @@ Make barebones changes on `master`:
 
 ```sh
 git checkout master
-# edit init.lua, colors/naysayer.lua, stylua.toml, README.md
+# edit init.lua, colors/naysayer.lua, stylua.toml, .editorconfig, README.md
 git add <files>
 git commit -m "<type>: ..."
 git push
@@ -136,10 +137,16 @@ docs: update branch workflow notes
 docs: clarify install steps
 ```
 
-Use `chore` for repo hygiene, formatting, and metadata:
+Use `chore` for repo hygiene and metadata:
 
 ```text
 chore: ignore Neovim log file
+```
+
+Use `format` when the diff is a formatter's output and nothing was hand-edited:
+
+```text
+format: stylua
 ```
 
 Use `refactor` when moving behavior between layers without changing the intent:
@@ -147,3 +154,4 @@ Use `refactor` when moving behavior between layers without changing the intent:
 ```text
 refactor: move yank highlight out of base config
 ```
+
