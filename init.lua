@@ -83,8 +83,6 @@ do
   vim.o.wildignorecase = true
   vim.opt.wildignore:append({ "*.o", "*.pyc", "*/__pycache__/*", "*/.git/*", "*/target/*" })
 
-  vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
   -- Open the quickfix window on its own when a search finds something, and close
   --  it when a rerun comes back empty -- a stale list sitting there looks exactly
   --  like a current result.
