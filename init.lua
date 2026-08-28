@@ -47,9 +47,20 @@ do
 
   vim.o.inccommand = "split"
 
-  vim.o.tabstop = 4
+  -- Four spaces, and never a literal tab. C, Odin and Lua ship no indent settings
+  --  of their own, so without this they fall through to Vim's raw defaults and
+  --  indent with 8-wide tabs. Python and Rust need nothing: their bundled
+  --  ftplugins already set `sw=4` and 'expandtab'. Jai is a filetype Neovim has
+  --  never heard of; it is registered and configured in `after/`, not here.
+  --
+  --  'tabstop' stays at the default 8 deliberately. With 'expandtab' on, nothing
+  --  here ever *writes* a tab, so 'tabstop' governs one thing only: how somebody
+  --  else's tabs render. At 4 a tab-indented file is pixel-identical to your own
+  --  indentation; at 8 it announces itself, and 'listchars' marks it with a `»`.
+  --  Same argument as `[dos]` in the statusline below -- the state worth seeing is
+  --  the one that is not yours. Neovim's own rust ftplugin leaves it at 8 too.
   vim.o.shiftwidth = 4
-  vim.o.softtabstop = 4
+  vim.o.softtabstop = -1 -- follow 'shiftwidth', so there is one number, not two
   vim.o.expandtab = true
 
   -- Four settings whose defaults are worse than one line of config.
@@ -173,14 +184,44 @@ do
   --
   --  All of it is now a plain 'statusline' string. The only part Vim has no item
   --  for is the branch, which comes from `b:branch` above.
+
+  ---One reserved slot, so a file in `after/plugin/` can add a field without
+  ---restating the eight below. A 'statusline' that has already been assigned
+  ---cannot be appended to, so without this the overlay has to copy the whole list
+  ---and the two drift apart -- which is duplication in the one config that is
+  ---otherwise strictly layered.
+  ---
+  ---  Empty here, and nothing in this file ever fills it: on `master` the bar
+  ---  renders exactly as it did before. Redefine it to add a field.
+  ---@return string
+  function _G.StatuslineExtra()
+    return ""
+  end
+
   vim.o.statusline = table.concat({
     " %t%m%r", -- basename, then [+] and [RO] when they apply
     "  %P", -- where the *window* sits in the file, not the cursor
     "  %l",
     [[%{empty(get(b:,'branch',''))?'':'  '.b:branch}]],
     "  %y",
+    [[%{v:lua.StatuslineExtra()}]], -- empty unless an overlay redefines it
     [[%{&fileformat!='unix'?'  ['.&fileformat.']':''}]],
     [[%{&fileencoding!='' && &fileencoding!='utf-8' ? '  '.&fileencoding : ''}]],
     "%=", -- left-aligned; the rest of the bar stays empty
   })
 end
+
+-- ============================================================
+-- NOT MAPPED, ON PURPOSE
+-- ============================================================
+--  Three things used to live here, all of them kickstart's, all of them shadowing
+--  or restating a key Neovim already has. Recorded because an absence leaves no
+--  trace in the code -- this is the only thing that stops it being re-added:
+--
+--    <C-h/j/k/l> -> `<C-w>h` and friends. Worse than redundant: mapping <C-l> cost
+--                   the default |CTRL-L-default|, which clears search highlighting
+--                   and runs :diffupdate on the way to redrawing.
+--    <Esc>       -> `<C-l>`, for exactly the reason above. The map existed only to
+--                   replace the :nohlsearch that mapping <C-l> had taken away.
+--    <Esc><Esc>  -> `<C-\><C-n>` in a terminal buffer. Two awkward keys, but the
+--                   ones Vim documents.
