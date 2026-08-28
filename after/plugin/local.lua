@@ -1,8 +1,7 @@
---
---  Known cost of the arrangement: the statusline below is a *superset* of the one
---  in `init.lua`, reassigned wholesale, because a format string that has already
---  been assigned cannot be appended to. Those two lists have to be kept in sync
---  by hand -- it is the one place where the split duplicates rather than layers.
+--  Everything here layers over `init.lua` rather than restating it. The statusline
+--  used to be the one exception -- copied wholesale to add a field, and kept in
+--  sync by hand -- until init.lua grew a reserved `StatuslineExtra` slot. Filling
+--  it is now the LSP section's job, and nothing here reassigns 'statusline'.
 
 -- ============================================================
 -- THIS MACHINE
@@ -90,6 +89,23 @@ do
 end
 
 -- ============================================================
+-- FILETYPES NEOVIM DOES NOT KNOW
+-- ============================================================
+do
+  -- Neovim ships no ftdetect, ftplugin, indent or syntax file for Jai, so a `.jai`
+  --  buffer has filetype `""` -- and an empty filetype is not merely cosmetic. It
+  --  means 'commentstring' is empty too, so `gcc` silently does nothing; it means
+  --  no FileType autocmd can ever fire for the buffer, whatever its pattern; and
+  --  it means indentation falls through to Vim's raw defaults.
+  --
+  --  Registering the extension is the whole fix. `vim.filetype.add` is the Lua
+  --  spelling of an ftdetect file, and once the name exists, `after/ftplugin/jai.lua`
+  --  is found by the normal runtimepath search -- which is where the style itself
+  --  lives, buffer-locally, rather than as a global in `init.lua`.
+  vim.filetype.add({ extension = { jai = "jai" } })
+end
+
+-- ============================================================
 -- KEYMAPS -- only what Neovim has no key for already
 -- ============================================================
 do
@@ -158,38 +174,23 @@ do
 end
 
 -- ============================================================
--- STATUSLINE -- core's, plus the LSP field
--- ============================================================
---  Reassigned in full rather than appended to. Keep in sync with `init.lua`.
-vim.o.statusline = table.concat({
-  " %t%m%r", -- basename, then [+] and [RO] when they apply
-  "  %P", -- where the *window* sits in the file, not the cursor
-  "  %l",
-  [[%{empty(get(b:,'branch',''))?'':'  '.b:branch}]],
-  "  %y",
-  [[%{v:lua.LspStatus()}]], -- defined in the LSP section below
-  [[%{&fileformat!='unix'?'  ['.&fileformat.']':''}]],
-  [[%{&fileencoding!='' && &fileencoding!='utf-8' ? '  '.&fileencoding : ''}]],
-  "%=", -- left-aligned; the rest of the bar stays empty
-})
-
--- ============================================================
 -- LSP -- built in, no nvim-lspconfig and no mason
 -- ============================================================
 do
   -- Each server is a file in `lsp/`, found by name on the runtimepath. A server
   --  whose binary is missing simply never attaches; that is not an error, and it
   --  is how `rust_analyzer` stays quiet until you are inside `rez env rust`.
-  --  Kept in a variable rather than inlined, because `LspStatus()` below has to ask
+  --  Kept in a variable rather than inlined, because `StatuslineExtra()` below has to ask
   --  what filetypes each one claims and `vim.lsp.config` is not enumerable --
   --  `pairs()` on it yields only `_configs`.
   local servers = { "clangd", "basedpyright", "rust_analyzer", "ols" }
   vim.lsp.enable(servers)
 
-  ---Statusline field. Empty when a server is attached, and empty when none is
-  ---configured for this filetype. `[no lsp]` appears only when one *should* be here
-  ---and is not: a crashed server, a missing binary, or nvim started outside the rez
-  ---resolve that provides it.
+  ---Fills the `StatuslineExtra` slot `init.lua` reserves, which is why the bar is
+  ---not reassigned anywhere in this file. Empty when a server is attached, and
+  ---empty when none is configured for this filetype. `[no lsp]` appears only when
+  ---one *should* be here and is not: a crashed server, a missing binary, or nvim
+  ---started outside the rez resolve that provides it.
   ---
   ---  This is the inverse of the usual `LSP +`, on the same reasoning as the `[dos]`
   ---  and encoding fields: a mark that is always present conveys nothing, and the
@@ -200,7 +201,7 @@ do
   ---
   ---  No caching: `get_clients()` measures ~0.3us, against a redraw budget of ~16ms.
   ---@return string
-  function _G.LspStatus()
+  function _G.StatuslineExtra()
     if #vim.lsp.get_clients({ bufnr = 0 }) > 0 then
       return ""
     end
