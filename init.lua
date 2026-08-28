@@ -31,15 +31,26 @@ do
   vim.o.showmode = true
 
   vim.o.undofile = true
+
   vim.o.ignorecase = true
   vim.o.smartcase = true
+
   vim.o.updatetime = 250
   vim.o.timeoutlen = 300
+
   vim.o.splitright = true
   vim.o.splitbelow = true
+
   vim.o.confirm = true -- prompt instead of failing on :q with unsaved changes
+
   vim.o.scrolloff = 10
+
   vim.o.inccommand = "split"
+
+  vim.o.tabstop = 4
+  vim.o.shiftwidth = 4
+  vim.o.softtabstop = 4
+  vim.o.expandtab = false
 
   -- Four settings whose defaults are worse than one line of config.
   vim.o.winborder = "single" -- was "": borders on every float
@@ -176,4 +187,3 @@ do
     "%=", -- left-aligned; the rest of the bar stays empty
   })
 end
-
