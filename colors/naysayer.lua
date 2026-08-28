@@ -1,22 +1,4 @@
--- naysayer -- Jonathan Blow's Emacs colours, vendored.
---
---  Lineage: Blow's hand-rolled Emacs theme -> nickav/naysayer-theme.el (eyeballed
---  off his compiler livestreams) -> RostislavArts/naysayer.nvim -> this file. The
---  palette below is copied verbatim from that port; what is *not* copied is its
---  set of `@`-prefixed treesitter groups, which used the Monokai accent colours
---  and made it noticeably louder than the Emacs original. The port's own README
---  admits as much: treesitter disabled is "most accurate to Jon's theme".
---
---  The idea worth preserving: syntax highlighting is almost off. Functions and
---  variables are the same tan as ordinary text, keywords are plain white, and the
---  single brightest thing on screen is the comments -- the prose a human wrote.
---  That is the opposite of a typical theme, where comments are dimmed to grey.
---
---  This is a real colorscheme file rather than a plugin, so `:colorscheme
---  naysayer` finds it on the runtimepath and re-sources it on every switch. The
---  plugin needed a `ColorSchemePre` hook to drop `package.loaded` because it
---  applied itself at module scope and `require` cached it; a colors/ file has no
---  such problem.
+-- Vendored naysayer palette, kept deliberately flat with prominent comments.
 
 local c = {
   background = "#062625",
@@ -34,11 +16,9 @@ local c = {
   warning = "#ffaa00",
   highlight = "#0b3335",
   line_fg = "#126367",
-  -- The mode line: dark ink on tan. Blow's is one flat bar and so is this.
   status_fg = "#12251b",
   status_bg = "#d3b58e",
-  -- Accents, used only where something must stand out as a *state* rather than
-  --  as syntax: diagnostics and Special.
+  -- Accents are reserved for diagnostics and other state.
   orange = "#FD971F",
   red = "#F92672",
   blue = "#66D9EF",
@@ -75,18 +55,8 @@ set(0, "IncSearch", { fg = c.status_fg, bg = c.warning })
 set(0, "Directory", { fg = c.constant })
 set(0, "Title", { fg = c.white })
 
--- Syntax. Deliberately flat: `Identifier` and `Function` are the same colour as
---  `Normal`, so neither variables nor calls are picked out from the text around
---  them. If you ever want them distinguished, this is the pair to change.
---
---  Only groups that need to *differ* from their parent are listed. Vim already
---  links Number/Boolean/Float to Constant, Conditional/Repeat/Exception/Keyword to
---  Statement, StorageClass/Structure/Typedef to Type, and Include/Define/Macro to
---  PreProc -- defining those again with the parent's own colour changes nothing.
---  Three break that rule on purpose and must stay: `Character`, because a char
---  literal reads as a string rather than a constant; and `Operator` and
---  `Delimiter`, which Vim links to *nothing* -- drop them and they fall through to
---  Neovim's stock foreground rather than to the `Normal` defined here.
+-- Define only groups that differ from their inherited parent. Character,
+-- Operator, and Delimiter are explicit because their default links are unsuitable.
 set(0, "Comment", { fg = c.comment })
 set(0, "String", { fg = c.string })
 set(0, "Character", { fg = c.string })
@@ -101,8 +71,7 @@ set(0, "Special", { fg = c.orange })
 set(0, "Delimiter", { fg = c.text })
 set(0, "Todo", { fg = c.background, bg = c.comment, bold = true })
 
--- Messages and diagnostics. These are states, not syntax, so they are the one
---  place colour is allowed to shout.
+-- Messages and diagnostics.
 set(0, "WarningMsg", { fg = c.warning })
 set(0, "ErrorMsg", { fg = c.error })
 set(0, "Error", { fg = c.error })
@@ -113,14 +82,13 @@ set(0, "DiagnosticHint", { fg = c.cyan })
 set(0, "DiagnosticUnderlineError", { sp = c.red, undercurl = true })
 set(0, "DiagnosticUnderlineWarn", { sp = c.warning, undercurl = true })
 
--- Completion menu (built-in `ins-completion`; there is no completion plugin).
+-- Completion menu.
 set(0, "Pmenu", { fg = c.text, bg = c.highlight })
 set(0, "PmenuSel", { fg = c.status_fg, bg = c.status_bg })
 set(0, "PmenuSbar", { bg = c.highlight })
 set(0, "PmenuThumb", { bg = c.line_fg })
 
--- Status line. One flat bar: `StatusLine` for the focused window, and the
---  receding `StatusLineNC` for the others.
+-- Status line.
 set(0, "StatusLine", { fg = c.status_fg, bg = c.status_bg })
 set(0, "StatusLineNC", { fg = c.line_fg, bg = c.gutter })
 

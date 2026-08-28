@@ -1,15 +1,4 @@
-# Neovim reads this natively (since 0.9), as does every other editor worth the
-#  name. It exists because init.lua sets a global shiftwidth of 4 -- right for C,
-#  Odin and Jai -- while stylua.toml formats this repo's own Lua at 2. Without a
-#  rule here the editor and the formatter quietly disagree, and stylua silently
-#  rewrites whatever you just typed.
-#
-#  Deliberately not a `-- vim: ts=2 sts=2 sw=2 et` modeline: that has to be pasted
-#  into every file and is only honoured by Vim. This covers the repo at once.
-#
-#  No max_line_length to mirror stylua's column_width: Neovim maps it to
-#  'textwidth', and the default 'formatoptions' contains `t`, which would start
-#  hard-wrapping comments as you type them.
+# Keep editing indentation aligned with stylua without setting 'textwidth'.
 
 root = true
 
@@ -20,4 +9,3 @@ indent_size = 2
 [*.{md,json,toml,yml,yaml}]
 indent_style = space
 indent_size = 2
-

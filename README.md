@@ -13,7 +13,7 @@ map cleanly to Neovim:
 - no file tree, tabs, icons, or visible whitespace markers
 - no automatic pair completion for `()`, `{}`, `[]`, or quotes
 - quiet syntax highlighting, with comments more prominent than most code
-- 4-column hard tabs rather than 8-column tabs or space-expanded indentation
+- 4-column space indentation, while literal tabs remain visibly 8 columns wide
 - search and compiler results as lists to walk with native quickfix commands
 - a plain statusline similar in spirit: file, position, line, version-control
   state, and filetype
@@ -52,18 +52,6 @@ cd "$HOME/.config/nvim"
 git checkout local
 ```
 
-## Branches
-
-`master` is the barebones config. It contains the base editor setup, the
-vendored colorscheme, and formatting rules for the Lua files.
-
-`local` is the daily-driver overlay. It rebases on top of `master` and contains
-personal additions such as `after/`, `lsp/`, native package plugins, and the
-plugin lockfile. It is not meant to be merged back into `master`.
-
-GitHub may offer to open a pull request for `local`; ignore that prompt. The
-branch is an extension branch, not a feature branch waiting to land.
-
 ## Layout
 
 ```text
@@ -71,6 +59,7 @@ init.lua              base config
 colors/naysayer.lua   vendored colorscheme
 stylua.toml           formatter settings for this repo
 .editorconfig         editor indent rules, so typing matches stylua
+AGENTS.md              branch ownership and contributor rules
 after/                local overlay, tracked only on local
 lsp/                  local LSP configs, tracked only on local
 nvim-pack-lock.json   local vim.pack lockfile
@@ -114,44 +103,3 @@ Rule of thumb:
 master changes -> rebase local
 local changes  -> leave master alone
 ```
-
-## Commit Types
-
-Use `feat` for new editor behavior:
-
-```text
-feat: add Odin language server
-feat: add local surround plugin
-```
-
-Use `fix` for correcting broken behavior:
-
-```text
-fix: use current yank highlight helper
-```
-
-Use `docs` for documentation-only changes:
-
-```text
-docs: update branch workflow notes
-docs: clarify install steps
-```
-
-Use `chore` for repo hygiene and metadata:
-
-```text
-chore: ignore Neovim log file
-```
-
-Use `format` when the diff is a formatter's output and nothing was hand-edited:
-
-```text
-format: stylua
-```
-
-Use `refactor` when moving behavior between layers without changing the intent:
-
-```text
-refactor: move yank highlight out of base config
-```
-
