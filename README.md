@@ -30,7 +30,13 @@ test -e "$HOME/.local/state/nvim" && mv "$HOME/.local/state/nvim" "$HOME/.local/
 test -e "$HOME/.local/share/nvim" && mv "$HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak"
 ```
 
-Clone the repo as Neovim's config directory:
+Clone the repo as Neovim's config directory with HTTPS:
+
+```sh
+git clone https://github.com/LBreede/naysayer.nvim.git "$HOME/.config/nvim"
+```
+
+Or with SSH:
 
 ```sh
 git clone git@github.com:LBreede/naysayer.nvim.git "$HOME/.config/nvim"
@@ -64,8 +70,9 @@ vim.opt.runtimepath:prepend(base)
 dofile(vim.fs.joinpath(base, "init.lua"))
 ```
 
-The overlay can then own `after/`, `lsp/`, plugins, and personal options while
-this repository remains directly usable on its own.
+The overlay's root `init.lua` can then contain personal options and plugins,
+with `lsp/` holding native server configurations. This repository remains
+directly usable on its own.
 
 ## Workflow
 
