@@ -50,7 +50,7 @@ do
   vim.o.tabstop = 4
   vim.o.shiftwidth = 4
   vim.o.softtabstop = 4
-  vim.o.expandtab = false
+  vim.o.expandtab = true
 
   -- Four settings whose defaults are worse than one line of config.
   vim.o.winborder = "single" -- was "": borders on every float
