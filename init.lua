@@ -117,7 +117,7 @@ do
 
   ---Reserved for an overlay to extend the statusline without copying it.
   ---@return string
-  function _G.StatuslineExtra()
+  function _G.NaysayerStatuslineExtra()
     return ""
   end
 
@@ -127,7 +127,7 @@ do
     "  %l",
     [[%{empty(get(b:,'branch',''))?'':'  '.b:branch}]],
     "  %y",
-    [[%{v:lua.StatuslineExtra()}]], -- empty unless an overlay redefines it
+    [[%{v:lua.NaysayerStatuslineExtra()}]], -- empty unless an overlay redefines it
     [[%{&fileformat!='unix'?'  ['.&fileformat.']':''}]],
     [[%{&fileencoding!='' && &fileencoding!='utf-8' ? '  '.&fileencoding : ''}]],
     "%=", -- left-aligned; the rest of the bar stays empty
