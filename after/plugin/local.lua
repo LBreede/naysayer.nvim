@@ -89,23 +89,6 @@ do
 end
 
 -- ============================================================
--- FILETYPES NEOVIM DOES NOT KNOW
--- ============================================================
-do
-  -- Neovim ships no ftdetect, ftplugin, indent or syntax file for Jai, so a `.jai`
-  --  buffer has filetype `""` -- and an empty filetype is not merely cosmetic. It
-  --  means 'commentstring' is empty too, so `gcc` silently does nothing; it means
-  --  no FileType autocmd can ever fire for the buffer, whatever its pattern; and
-  --  it means indentation falls through to Vim's raw defaults.
-  --
-  --  Registering the extension is the whole fix. `vim.filetype.add` is the Lua
-  --  spelling of an ftdetect file, and once the name exists, `after/ftplugin/jai.lua`
-  --  is found by the normal runtimepath search -- which is where the style itself
-  --  lives, buffer-locally, rather than as a global in `init.lua`.
-  vim.filetype.add({ extension = { jai = "jai" } })
-end
-
--- ============================================================
 -- KEYMAPS -- only what Neovim has no key for already
 -- ============================================================
 do
