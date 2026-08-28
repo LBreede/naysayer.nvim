@@ -81,6 +81,9 @@ do
   --  easy thing to wave through. `:trust` manages the list.
   vim.o.exrc = true
 
+  vim.o.list = true
+  vim.opt.listchars = { tab = "\u{bb} ", trail = "\u{b7}", nbsp = "\u{2423}" }
+
   vim.schedule(function()
     vim.o.clipboard = "unnamedplus"
   end)
