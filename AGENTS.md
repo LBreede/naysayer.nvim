@@ -26,6 +26,7 @@ Belongs on `master`:
 - `init.lua`
 - `colors/`
 - `stylua.toml`
+- `.editorconfig`
 - `README.md`
 - `.gitignore`
 - `AGENTS.md`
