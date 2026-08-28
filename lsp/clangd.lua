@@ -1,6 +1,6 @@
 -- clangd. Neovim ships no server configs of its own, so this file *is* the
---  config: `vim.lsp.enable 'clangd'` in init.lua finds it by name on the
---  runtimepath. No nvim-lspconfig, no mason.
+--  config: the `vim.lsp.enable` call in `after/plugin/local.lua` finds it by name
+--  on the runtimepath. No nvim-lspconfig, no mason.
 --
 --  NOTE: clangd needs the compile flags to resolve includes. It looks upward for
 --  `compile_commands.json` (emit one with `cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON`
