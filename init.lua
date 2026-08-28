@@ -124,7 +124,7 @@ do
   vim.o.statusline = table.concat({
     " %t%m%r", -- basename, then [+] and [RO] when they apply
     "  %P", -- where the *window* sits in the file, not the cursor
-    "  %l",
+    "  %l:%c",
     [[%{empty(get(b:,'branch',''))?'':'  '.b:branch}]],
     "  %y",
     [[%{v:lua.NaysayerStatuslineExtra()}]], -- empty unless an overlay redefines it

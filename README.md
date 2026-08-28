@@ -14,8 +14,8 @@ map cleanly to Neovim:
 - quiet syntax highlighting, with comments more prominent than most code
 - 4-column space indentation, while literal tabs remain visibly 8 columns wide
 - search and compiler results as lists to walk with native quickfix commands
-- a plain statusline similar in spirit: file, position, line, version-control
-  state, and filetype
+- a plain statusline similar in spirit: file, position, line and column,
+  version-control state, and filetype
 
 Personal plugins and preferences belong in a separate overlay repository, which
 can load this repository as a submodule without changing the standalone base.
