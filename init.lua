@@ -179,16 +179,3 @@ do
   })
 end
 
--- ============================================================
--- SMALL THINGS
--- ============================================================
-do
-  -- Window navigation without the <C-w> prefix.
-  for _, key in ipairs({ "h", "j", "k", "l" }) do
-    vim.keymap.set("n", "<C-" .. key .. ">", "<C-w><C-" .. key .. ">", { desc = "Move focus" })
-  end
-
-  vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-end
-
--- vim: ts=2 sts=2 sw=2 et
