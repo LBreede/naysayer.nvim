@@ -33,6 +33,26 @@ do
 
   require("mini.pairs").setup()
   require("mini.surround").setup()
+
+  -- Shipped inside Neovim since 0.12, but not loaded unless asked for. `undofile`
+  --  is on in init.lua, so the tree already survives across sessions -- this is
+  --  the only thing that lets you see it. `:Undotree`, cursor moves the undo.
+  vim.cmd.packadd("nvim.undotree")
+
+  -- `:Cfilter foo` keeps only the quickfix entries matching foo, `:Cfilter! foo`
+  --  drops them, and they compose -- so a 400-hit :grep narrows to the dozen you
+  --  meant in two keystrokes each. This is the verb the grep -> quickfix -> ]q loop
+  --  in init.lua was missing: it could produce a list and walk it, but not thin it.
+  --  Bundled with Neovim; `:Lfilter` does the same for a location list.
+  vim.cmd.packadd("cfilter")
+
+  -- 0.13 grows a `:packupdate` command; on 0.12 the update path is a Lua call,
+  --  which is not something anyone types from memory. Nothing is installed
+  --  outright: the call opens a confirmation buffer holding the changelog, and
+  --  the update happens when you :write it.
+  vim.api.nvim_create_user_command("PackUpdate", function()
+    vim.pack.update()
+  end, { desc = "Update the plugins managed by vim.pack" })
 end
 
 -- ============================================================
@@ -48,56 +68,69 @@ do
   vim.o.mouse = "a"
   vim.o.signcolumn = "yes" -- always on, so text never shifts when a diagnostic appears
 
+  -- The completion popup is as wide as its widest entry, and rust-analyzer and
+  --  basedpyright both return signatures that run the full width of the window.
+  --  Capped, it sits beside the code instead of on top of it.
+  vim.o.pummaxwidth = 60
+  vim.o.pumheight = 12 -- was 0, meaning "as tall as the window"; same reasoning
+
+  -- Per-project `.nvim.lua`, for what cannot be global: a 'makeprg' this repo
+  --  alone needs, an extra root marker, a formatter everyone here disagrees
+  --  about. Neovim asks before sourcing one and remembers the answer, so a repo
+  --  you cloned cannot quietly run code -- though it can ask, and a prompt is an
+  --  easy thing to wave through. `:trust` manages the list.
+  vim.o.exrc = true
+
   vim.schedule(function()
     vim.o.clipboard = "unnamedplus"
   end)
 end
 
 -- ============================================================
--- KEYMAPS -- kickstart's names, so the muscle memory transfers
+-- KEYMAPS -- only what Neovim has no key for already
 -- ============================================================
 do
-  local map = function(keys, rhs, desc)
-    vim.keymap.set("n", keys, rhs, { desc = desc })
-  end
-
-  -- These keep kickstart's names so the muscle memory survives switching between
-  --  configs, but each one is backed by a built-in rather than by Telescope. The
-  --  ones with no plugin-free equivalent are listed at the bottom of this block.
+  -- What used to be here was kickstart's `<leader>s*` family. Every one of them
+  --  was a three-key alias for a command that is already short, so the whole set
+  --  is gone and the commands are the interface:
   --
-  --  Trailing space and no <CR>: the mapping leaves you on the command line with
-  --  the command typed, so wildmenu's fuzzy matching does the picking.
-  map("<leader>sf", ":find ", "[S]earch [F]iles")
-  map("<leader>sg", ":grep ", "[S]earch by [G]rep")
-  map("<leader>sh", ":help ", "[S]earch [H]elp")
-  map("<leader>sk", ":map ", "[S]earch [K]eymaps")
-  map("<leader>s.", ":browse oldfiles<CR>", '[S]earch Recent Files ("." for repeat)')
-  map("<leader>sd", vim.diagnostic.setqflist, "[S]earch [D]iagnostics")
-  map("<leader>sr", "<cmd>copen<CR>", "[S]earch [R]esume -- reopen the last result list")
-  map("<leader>sc", "q:", "[S]earch [C]ommands -- the command-line window")
-  map("<leader>sn", ":edit " .. vim.fn.stdpath("config") .. "/", "[S]earch [N]eovim files")
-  map("<leader><leader>", ":buffer ", "[ ] Find existing buffers")
-
-  -- `:vimgrep` over the current file only, which is the built-in shape of
-  --  "fuzzy find in this buffer". The <Left>s park the cursor between the slashes.
-  map("<leader>/", ":vimgrep //j %<Left><Left><Left><Left>", "[/] Search in current buffer")
-
-  vim.keymap.set({ "n", "v" }, "<leader>sw", function()
-    vim.cmd("grep -w " .. vim.fn.expand("<cword>"))
-  end, { desc = "[S]earch current [W]ord" })
-
-  --  Dropped, with no built-in worth faking: `<leader>ss` (Telescope's own picker
-  --  list) and `<leader>s/` (live grep across open buffers).
-
-  --  NOTE: no `]q` / `[q` here -- Neovim maps those to :cnext / :cprevious itself.
-  map("<leader>q", vim.diagnostic.setloclist, "Open diagnostic [Q]uickfix list")
+  --    <leader>sf  ->  :find <name>          <leader>sr  ->  :cope
+  --    <leader>sg  ->  :grep <pattern>       <leader>sn  ->  :e $MYVIMRC
+  --    <leader>sh  ->  :h <subject>          <leader>s.  ->  :bro old
+  --    <leader>sk  ->  :map                  <leader>sc  ->  q:   (native, shorter)
+  --    <leader>/   ->  :vim //j %            <leader><leader>  ->  :b <name>
+  --
+  --  `<leader>sw` was "grep the word under the cursor", which Vim already spells:
+  --
+  --    :gr -w <C-r><C-w>
+  --
+  --  |c_CTRL-R_CTRL-W| puts the word under the cursor onto the command line, and
+  --  works in front of *any* command -- :h, :b, :e -- which one mapping per verb
+  --  never could. That is the trade: a mapping saves typing a colon, a command
+  --  composes.
+  --
+  --  Wildmenu's 'fuzzy' matching does the picking either way; none of that came
+  --  from the mappings. `<leader>sd` and `<leader>q` became `:Diagnostics`, in the
+  --  LSP section -- the one thing here with no native command behind it.
+  --
+  --  NOTE: `]q` / `[q` were never mapped -- Neovim maps those itself, along with
+  --  `]d`, `]l`, `]b`, `]a`, `]t` and `]<Space>`. See |]q| and friends.
 
   -- Manual completion only: no popup unless you ask for it. After text, <Tab>
   --  starts or advances built-in insert completion; after whitespace, it remains
   --  indentation.
+  --  Three legs, in this order. Neovim maps <Tab> itself -- to `vim.snippet.jump`
+  --  -- and overriding it without the snippet leg is a silent regression: a
+  --  completion from clangd or rust-analyzer expands with placeholders, and <Tab>
+  --  then does nothing useful, stranding you on the first one. The popup wins when
+  --  it is open, because cycling is what you meant; the snippet wins next.
   vim.keymap.set("i", "<Tab>", function()
     if vim.fn.pumvisible() == 1 then
       return "<C-n>"
+    end
+
+    if vim.snippet.active({ direction = 1 }) then
+      return "<Cmd>lua vim.snippet.jump(1)<CR>"
     end
 
     local col = vim.fn.col(".") - 1
@@ -109,19 +142,16 @@ do
   end, { expr = true, desc = "Complete word" })
 
   vim.keymap.set("i", "<S-Tab>", function()
-    return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
-  end, { expr = true, desc = "Previous completion" })
+    if vim.fn.pumvisible() == 1 then
+      return "<C-p>"
+    end
 
-  -- Kickstart's arrow-key tip, verbatim apart from the loop. Failing silently
-  --  would just be annoying; naming the replacement is what makes the habit stick.
-  for arrow, key in pairs({ left = "h", down = "j", up = "k", right = "l" }) do
-    vim.keymap.set(
-      "n",
-      "<" .. arrow .. ">",
-      ('<cmd>echo "Use %s to move!!"<CR>'):format(key),
-      { desc = "Use " .. key .. " to move" }
-    )
-  end
+    if vim.snippet.active({ direction = -1 }) then
+      return "<Cmd>lua vim.snippet.jump(-1)<CR>"
+    end
+
+    return "<S-Tab>"
+  end, { expr = true, desc = "Previous completion" })
 end
 
 -- ============================================================
@@ -190,6 +220,27 @@ do
     update_in_insert = false,
     float = { source = "if_many" }, -- the border comes from 'winborder'
   })
+
+  -- `virtual_text` is off above, and `<C-w>d` floats the one under the cursor,
+  --  which answers "what is wrong here". `virtual_lines` answers the other
+  --  question -- "all of them, in full, now" -- rendered inline beneath each
+  --  line. Much too loud to leave on, and exactly right for the minute spent
+  --  reading a rust-analyzer trait error. Same shape as `<leader>th` below.
+  -- The one thing in the old keymap block with no native command behind it:
+  --  `vim.diagnostic.setqflist()` exists, `:Diagnostics` did not. A bang sends the
+  --  buffer's diagnostics to the location list instead of the quickfix list, which
+  --  is the same distinction :grep and :lgrep draw.
+  vim.api.nvim_create_user_command("Diagnostics", function(opts)
+    if opts.bang then
+      vim.diagnostic.setloclist()
+    else
+      vim.diagnostic.setqflist()
+    end
+  end, { bang = true, desc = "Diagnostics into the quickfix list (! for location list)" })
+
+  vim.keymap.set("n", "<leader>tl", function()
+    vim.diagnostic.config({ virtual_lines = not vim.diagnostic.config().virtual_lines })
+  end, { desc = "[T]oggle diagnostic [L]ines" })
 
   vim.api.nvim_create_autocmd("LspAttach", {
     desc = "LSP keymaps",
@@ -300,12 +351,198 @@ do
 end
 
 -- ============================================================
+-- BUILDING AND RUNNING -- separate verbs, because they answer differently
+-- ============================================================
+do
+  -- init.lua wires :grep -> quickfix -> ]q and calls the result "a list you
+  --  walk". Compile errors are the other half of that loop and they arrive by the
+  --  same route: :make runs 'makeprg', 'errorformat' parses what comes back, and
+  --  the result is the list you already know how to step through.
+  --
+  --  Building and running are two keys, not one. `:make` is silent and speaks
+  --  through the quickfix list, which is exactly right for a compiler: no output
+  --  means it worked. Running a program is the reverse -- the output *is* the
+  --  result -- so `<leader>r` opens a terminal split and shows it. Conflating the
+  --  two means a script that succeeds looks identical to a keymap that did
+  --  nothing, which is precisely what happened when <leader>b ran Python.
+  --
+  --  Neovim ships compiler plugins for part of this. `:compiler gcc` and
+  --  `:compiler cargo` set an 'errorformat' that is already debugged, which is
+  --  not a pattern to hand-write when someone has done it for you. Odin and
+  --  Python have none, so those two are spelled out. Without a bang `:compiler`
+  --  sets its options buffer-locally, which is what makes this safe from a
+  --  FileType autocmd.
+  local compilers = { c = "gcc", cpp = "gcc", rust = "cargo" }
+
+  -- Read by cargo.vim as it loads, producing `cargo build $*`. Without it
+  --  'makeprg' is a bare `cargo` and :make just prints the help text.
+  vim.g.cargo_makeprg_params = "build"
+
+  -- `main.odin(12:5) Error: undeclared identifier: foo`
+  local odin_errorformat = [[%f(%l:%c) %m]]
+
+  -- A Python traceback is one error smeared over many lines. Each `File "...",
+  --  line N` frame opens an entry (%A), the indented source line below it is a
+  --  continuation (%C), and the unindented `ValueError: boom` that ends the
+  --  traceback (%Z) attaches to the last frame opened -- the innermost one, which
+  --  is where the cursor should land. %-G discards the rest: the "Traceback"
+  --  banner, and the caret line under a SyntaxError.
+  local python_errorformat = table.concat({
+    [[%A%*\sFile "%f"\, line %l\, in %o]],
+    [[%A%*\sFile "%f"\, line %l]],
+    [[%C %.%#]],
+    [[%Z%m]],
+    [[%-G%.%#]],
+  }, ",")
+
+  -- Same shape as `formatters` in the FORMATTING section above: filetype to a
+  --  function of the buffer's name -- plus the argument string -- returning the
+  --  command line to run.
+  --
+  --  Each one places the arguments itself, because appending them is wrong in
+  --  three of the four cases. `cargo run foo` passes `foo` to *cargo*, which is why
+  --  it needs `--` first; odin is the same. `make run foo` reads `foo` as a second
+  --  target, so the args go in a variable and the Makefile has to pick them up with
+  --  `$(ARGS)` -- a convention, not a guarantee. Only Python takes them plainly.
+  --
+  --  `args` is passed through unescaped: it is a fragment of a shell command line,
+  --  so quoting, globs and `>` redirects work the way they would in the shell. The
+  --  *filename* is escaped, because that one is not yours to quote.
+  local runners = {
+    c = function(_, args)
+      return "make run" .. (args == "" and "" or " ARGS=" .. vim.fn.shellescape(args))
+    end,
+    cpp = function(_, args)
+      return "make run" .. (args == "" and "" or " ARGS=" .. vim.fn.shellescape(args))
+    end,
+    rust = function(_, args)
+      return "cargo run" .. (args == "" and "" or " -- " .. args)
+    end,
+    odin = function(_, args)
+      return "odin run ." .. (args == "" and "" or " -- " .. args)
+    end,
+    python = function(name, args)
+      return "python " .. vim.fn.shellescape(name) .. (args == "" and "" or " " .. args)
+    end,
+  }
+
+  vim.api.nvim_create_autocmd("FileType", {
+    desc = "Set 'makeprg' and 'errorformat' for :make",
+    group = vim.api.nvim_create_augroup("make", { clear = true }),
+    pattern = { "c", "cpp", "rust", "odin", "python" },
+    callback = function(event)
+      local ft = vim.bo[event.buf].filetype
+      if compilers[ft] then
+        vim.cmd.compiler(compilers[ft])
+      elseif ft == "odin" then
+        vim.bo[event.buf].makeprg = "odin build ."
+        vim.bo[event.buf].errorformat = odin_errorformat
+      elseif ft == "python" then
+        vim.bo[event.buf].makeprg = "python %"
+        vim.bo[event.buf].errorformat = python_errorformat
+      end
+    end,
+  })
+
+  -- `:update` first -- compiling the file on disk while the buffer says something
+  --  else is how you spend ten minutes on an error that is no longer there. It
+  --  writes only a modified buffer, so it costs nothing the rest of the time.
+  --
+  --  `silent` keeps the compiler's own chatter off the screen: the quickfix list
+  --  is the output. What that costs is any sign of progress during a long build.
+  --
+  --  Python is deliberately absent: it has no build step, and `python %` would
+  --  *run* the file. Its 'makeprg' is still set above, so a bare `:make` remains
+  --  available for the odd time you want a traceback parsed into the quickfix
+  --  list -- but the build key says so rather than silently running your program.
+  local buildable = { c = true, cpp = true, rust = true, odin = true }
+
+  vim.keymap.set("n", "<leader>b", function()
+    local ft = vim.bo.filetype
+    if not buildable[ft] then
+      local hint = runners[ft] and " -- use <leader>r to run it" or ""
+      return vim.notify(("nothing to build for filetype '%s'%s"):format(ft, hint), vim.log.levels.WARN)
+    end
+    vim.cmd("update")
+    vim.cmd("silent make")
+    vim.cmd("redraw!")
+  end, { desc = "[B]uild" })
+
+  -- The run side. A terminal split rather than `:!`: the program keeps the screen
+  --  until you are done reading it, scrollback works, and `<C-\><C-n>` gets you
+  --  back to normal mode. 'splitbelow' is on, so `:new` opens underneath.
+  --
+  --  `make run` for C and C++ because the binary's name is a property of the
+  --  Makefile, not something Neovim can guess. Projects that spell it differently
+  --  are what 'exrc' and a `.nvim.lua` are for.
+  local function run(args)
+    local build = runners[vim.bo.filetype]
+    if not build then
+      return vim.notify(("nothing to run for filetype '%s'"):format(vim.bo.filetype), vim.log.levels.WARN)
+    end
+    vim.cmd("update")
+    local cmd = build(vim.api.nvim_buf_get_name(0), args or "")
+    vim.cmd.new()
+    vim.cmd("resize 15")
+    -- `termopen()` is deprecated as of 0.12; this is its replacement.
+    vim.fn.jobstart(cmd, { term = true })
+  end
+
+  -- `:Run --flag file.txt` passes arguments; `:Run` alone is the bare run. The
+  --  command exists so the arguments have somewhere to live: command-line history
+  --  then remembers them, so `:Run<Up>` repeats the last invocation and `q:` edits
+  --  it -- which is the built-in answer to "remember my arguments", and better than
+  --  a variable this file would have to manage.
+  vim.api.nvim_create_user_command("Run", function(opts)
+    run(opts.args)
+  end, { nargs = "*", complete = "file", desc = "Run the current file, with arguments" })
+
+  -- Two keys: the lowercase one acts, the uppercase one leaves you on the command
+  --  line with `:Run ` typed, so wildmenu completes filenames as you go. No <CR> on
+  --  the second, deliberately.
+  vim.keymap.set("n", "<leader>r", function()
+    run("")
+  end, { desc = "[R]un" })
+  vim.keymap.set("n", "<leader>R", ":Run ", { desc = "[R]un with arguments" })
+
+  -- init.lua already opens the quickfix window after :grep, under its own augroup
+  --  and its own pattern list. A second autocmd rather than an edit to that one:
+  --  reusing the name with `clear = true` would delete init.lua's copy, and this
+  --  file is meant to read as a diff against that one, not to reach into it.
+  vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+    desc = "Open quickfix when :make has entries",
+    group = vim.api.nvim_create_augroup("quickfix-make", { clear = true }),
+    pattern = "make",
+    callback = function()
+      vim.cmd(#vim.fn.getqflist() > 0 and "copen" or "cclose")
+    end,
+  })
+end
+
+-- ============================================================
 -- SMALL THINGS
 -- ============================================================
+
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Flash the yanked text",
   group = vim.api.nvim_create_augroup("yank-highlight", { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+-- 'autoread' is on by default, but it only reloads a file once Neovim notices the
+--  timestamp moved, and it does not go looking on its own. Fine until the
+--  `black .` before a push -- or a branch switch -- rewrites a file that is open
+--  here, at which point the buffer is quietly stale and the next :write is the
+--  one that has to ask whether you meant it. 0.13 grows filesystem watchers for
+--  this; on 0.12 you ask.
+vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+  desc = "Check for files changed outside Neovim",
+  group = vim.api.nvim_create_augroup("checktime", { clear = true }),
+  callback = function()
+    if vim.o.buftype == "" then
+      vim.cmd.checktime()
+    end
   end,
 })
